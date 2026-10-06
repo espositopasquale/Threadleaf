@@ -1,0 +1,152 @@
+# ThreadLeaf reads this file when it starts. Restart the CLI or server after edits.
+# Paths below are relative to the repository root, not your terminal's directory.
+
+[models]
+# Use an installed Ollama model name. Run `python cli.py --list-models` to see
+# what's available, or `python setup.py` to download and configure another one.
+# This model also generates document display titles at server startup.
+llm = "llama3.2:1b"
+
+# Turns documents and questions into vectors for similarity search. Choose a
+# model that understands your documents' languages. After changing it, rebuild
+# the index with `python ingest.py`; vectors from different models don't mix.
+embedding = "nomic-embed-text-v2-moe"
+
+[language]
+# A language hint for the chat model, not a filter on which files get indexed.
+# Describe the collection here if your documents use several languages.
+documents = "Italian, English"
+
+# "auto" follows the question's language. Use "English" or "Italian" for a fixed
+# answer language. This doesn't change the web or CLI controls. The CLI's --lang
+# flag and /lang command can override it for that session.
+answer = "auto"
+
+[rag]
+# Put PDF, TXT and MD files here; subfolders appear in the web document panel.
+# If you change this path, add the new directory to .gitignore too.
+docs_dir = "documents"
+
+# Chroma stores the vector index here. Conversation history is stored separately
+# in state/conversations.sqlite3. Ignore this directory if you change its path.
+db_dir = "db"
+
+# Collection name inside Chroma. Changing this selects a different index,
+# so ingest your documents before expecting results from the new collection.
+collection = "docs"
+
+# Passage length in characters, not tokens. Larger passages keep more surrounding
+# text, but may bury a short answer among unrelated details. Reindex after changing.
+chunk_size = 800
+
+# Characters shared by adjacent passages so text near a boundary isn't lost.
+# Keep this below chunk_size. More overlap stores more repeated text; reindex after edits.
+chunk_overlap = 350
+
+# Passages per embedding request and database write during ingestion.
+# Lower this if indexing runs out of memory or the embedding model struggles.
+batch_size = 32
+
+# Final passages sent to the chat model. More context isn't always better,
+# especially with a small model and a limited context window.
+top_k = 4
+
+# Candidates gathered from each retrieval ranking before fusion and reranking.
+# A larger pool can recover overlooked passages, but adds ranking work.
+candidate_k = 24
+
+# Balance keyword and semantic ranks: 0 favors semantic search, 1 favors keywords.
+# Keywords help with names and exact terms; semantic matches help with paraphrases.
+lexical_weight = 0.6
+
+# Semantic-distance gate for model-selected passages in extractive mode.
+# Smaller distances mean closer matches. Above this cutoff, the answer is withheld.
+# This is a distance, not a confidence percentage. Revisit it after changing embeddings
+# or the index's distance metric. It doesn't gate generated summaries.
+max_semantic_distance = 0.65
+
+[layout]
+# Detect PDF regions during ingestion using local CPU weights. Missing dependencies
+# or weights leave page-aware native extraction active and produce a warning.
+# Install requirements-layout.txt and run python -m scripts.prepare_layout first.
+# PaddlePaddle currently needs Python 3.11–3.13 for this app; Python 3.14
+# can still use the native extraction path without the optional detector.
+enabled = true
+model = "PP-DocLayout-M"
+revision = "7dbfcce"
+# Rendering resolution relative to PDF points. Higher values cost more memory.
+render_scale = 1.5
+threads = 2
+# Original text, layout text, region coordinates and warnings are saved under
+# state/document_layout/. Scanned pages still need OCR; this first version has none.
+
+[reranker]
+# Checks the question against candidate passages before selecting the final ones.
+# Set false to use hybrid retrieval alone. Missing model files trigger that fallback too.
+enabled = true
+
+# Hugging Face repository for the local CPU reranker, independent of Ollama.
+# Run `python -m scripts.prepare_reranker` after changing this model or its revision.
+model = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1"
+
+# Pinned revision, so another installation downloads the same model files.
+revision = "1427fd6"
+
+# Path inside the model repository. This quantized ONNX file keeps CPU memory use down.
+file = "onnx/model_quint8_avx2.onnx"
+
+# Candidate-pool size requested for reranking. Keep it at least as large as rag.top_k;
+# adjust it alongside rag.candidate_k when experimenting with a wider search.
+top_n = 24
+
+# Token budget for each question/passage pair. Longer pairs take more time to score.
+# Passages are truncated to fit; very long questions are shortened too.
+max_length = 384
+
+# Question/passage pairs scored in one ONNX call, separate from rag.batch_size.
+# Larger batches can improve throughput, but need more memory.
+batch_size = 4
+
+# CPU threads used inside ONNX inference. More threads aren't always faster;
+# leave some CPU capacity for Ollama and the web server.
+threads = 2
+
+[coreference]
+# Link references in follow-up questions using a trained multilingual NLP model.
+# This replaces chat-model query rewriting; hybrid retrieval and reranking stay in place.
+# Download once with `python -m scripts.prepare_coreference` (about 531 MB).
+# Without local weights, questions stay unchanged; no previous answer is appended.
+enabled = true
+model = "talmago/allennlp-coref-onnx-mMiniLMv2-L12-H384-distilled-from-XLMR-Large"
+# Pin the downloaded model and tokenizer to the same repository revision.
+revision = "5d20fd4"
+# CPU inference threads, separate from the document reranker's setting.
+threads = 4
+
+[llm]
+# Low values make wording more predictable. Higher values allow more variation
+# in generated answers, but won't fix a bad retrieval result.
+temperature = 0.1
+
+# Maximum tokens generated for an answer, not a word count. Increase this if useful
+# answers are cut short; longer responses take more time to generate.
+max_tokens = 500
+
+# Ollama's context budget in tokens, including instructions, document passages,
+# recent conversation and the answer. Allow room here when increasing top_k.
+context_window = 4096
+
+# "generated" allows summaries and free-form answers. "extractive" asks the model
+# to choose a passage, then returns its source wording or declines to answer.
+# Extractive mode limits invented wording, but can still choose the wrong passage.
+# Greetings and small talk remain conversational in either mode.
+answer_mode = "generated"
+
+[server]
+# Listen on this machine only. Use "0.0.0.0" if you deliberately want LAN access;
+# the app has no authentication, so anyone who can reach it can access its API.
+host = "127.0.0.1"
+
+# Open http://127.0.0.1:4321 with the default host and port. Change this if another
+# process uses the port, then use the new port in your browser.
+port = 4321

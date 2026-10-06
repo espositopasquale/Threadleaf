@@ -1,0 +1,5 @@
+# Optional ingestion dependencies; the chat application does not need these.
+paddleocr>=3.0,<4
+paddlepaddle>=3.0,<4
+pypdfium2>=4.30,<6
+Pillow>=10

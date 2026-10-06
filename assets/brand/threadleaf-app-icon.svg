@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 46 46" fill="none">
+  <title>ThreadLeaf app icon</title>
+  <desc>A document and leaf on a rounded lavender tile.</desc>
+  <rect width="46" height="46" rx="14" fill="#eee6f4"/>
+  <g transform="translate(7 7)">
+      <path d="M8 4H19L24 9V25C24 27 23 28 21 28H8C6 28 5 27 5 25V7C5 5 6 4 8 4Z" fill="#fffefa" stroke="#77618a" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M19 4V9H24" stroke="#77618a" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M10 12H17M10 17H15" stroke="#77618a" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M18 25C15 19 19 14 29 13C29 22 25 27 18 25Z" fill="#71876c"/>
+      <path d="M16 28C19 24 22 20 26 17" stroke="#fffefa" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,6 @@
+[
+  {"question": "Quando si acquista la capacità giuridica?", "sources": ["codice-civile.pdf"], "support_contains": "giuridica si acquista dal momento della nascita"},
+  {"question": "A quale età si acquista la maggiore età?", "sources": ["codice-civile.pdf"], "support_contains": "maggiore eta e fissata al compimento del diciottesimo anno"},
+  {"question": "Che cosa sono le pertinenze?", "sources": ["codice-civile.pdf"], "support_contains": "Sono pertinenze le cose destinate"},
+  {"question": "Come si definisce il possesso?", "sources": ["codice-civile.pdf"], "support_contains": "Il possesso e il potere sulla cosa"}
+]

@@ -1,0 +1,15 @@
+[
+  {"question":"Hey what'up?", "casual":true},
+  {"question":"Hey, what is up?", "casual":true},
+  {"question":"Hi", "casual":true},
+  {"question":"How are you?", "casual":true},
+  {"question":"Thanks!", "casual":true},
+  {"question":"Grazie, sei stato molto gentile!", "casual":true},
+  {"question":"Ciao, come va?", "casual":true},
+  {"question":"Hello, what degree does Alex have in the CV?", "casual":false},
+  {"question":"What did he study?", "casual":false},
+  {"question":"Ciao, riassumi questo documento.", "casual":false},
+  {"question":"Summarize the selected document", "casual":false},
+  {"question":"Who is Pasquale?", "casual":false},
+  {"question":"What is legal capacity?", "casual":false}
+]

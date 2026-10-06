@@ -1,0 +1,55 @@
+name: threadleaf
+
+x-app: &app
+  image: threadleaf:local
+  build:
+    context: .
+    args:
+      INSTALL_LAYOUT: ${INSTALL_LAYOUT:-false}
+  environment:
+    OLLAMA_HOST: http://ollama:11434
+    PREPARE_LAYOUT: ${INSTALL_LAYOUT:-false}
+  volumes:
+    - ./documents:/app/documents
+    - ./config.toml:/app/config.toml:ro
+    - ./system_prompt.txt:/app/system_prompt.txt:ro
+    - threadleaf-db:/app/db
+    - threadleaf-state:/app/state
+    - threadleaf-models:/app/models
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  # Download configured models before the web server generates document titles.
+  initialize:
+    <<: *app
+    command: ["python", "-m", "scripts.container_setup"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  threadleaf:
+    <<: *app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${THREADLEAF_PORT:-4321}:4321"
+    depends_on:
+      initialize:
+        condition: service_completed_successfully
+
+volumes:
+  ollama-models:
+  threadleaf-db:
+  threadleaf-state:
+  threadleaf-models:
